@@ -1,4 +1,4 @@
-#  REDM - A script for RSG framework
+#  REDM - TBRP-COMPANIONS - A script for RSG framework
 
 ## Description
 
