@@ -56,14 +56,14 @@ With this script players are able to own pets that can retrieve hunted prey, tra
                 title = 'Call pet',
                 icon = 'dog',
                 type = 'server',
-                event = 'rdn_companions:loaddog',
+                event = 'tbrp_companions:loaddog',
                 shouldClose = true
             }, {
                 id = 'petawaypet',
                 title = 'Putaway pet',
                 icon = 'dog',
                 type = 'client',
-                event = 'rdn_companions:putaway',
+                event = 'tbrp_companions:putaway',
                 shouldClose = true
             },
         },
