@@ -5,9 +5,9 @@ Config = {}
 Config.Debug = false
 Config.FadeIn = true
 Config.DistanceSpawn = 20.0
-Config.EnableTarget = true
+Config.EnableTarget = false --For Pet Shop NPC
 
-Config.Framework = "rsg" 
+Config.KeyBind = 'E'
 
 Config.CallPetKey = true --Set to true to use the CallPet hotkey below
 
@@ -34,20 +34,15 @@ Config.TrackkOnlyAnimals = false -- The track command works on animal types, not
 Config.TrackOnlyNPC = false -- If this is enabled, you can track NPC peds and animals but not people
 -->>
 
-Config.NotificationSound = true -- when UseSeedBasedZones is enabled, play notification sound when the player is doing some actions
-
-
 Config.DefensiveMode = true --If set to true, pets will become hostile to anything you are in combat with
-
-
 Config.NoFear = true --Set this to true if you are using Bears/Wolves as pets so that your horses won't be in constant fear and wont get stuck on the eating dead body animation.
 
-
-Config.AnimalTrackingJobOnly = false -- If true only people with the jobs below can use the tracking option
-Config.AnimalTrackingJobs = {
-	[1] = 'police',
-	[2] = 'hunter',
-}
+--Not working right now
+--Config.AnimalTrackingJobOnly = false -- If true only people with the jobs below can use the tracking option
+--Config.AnimalTrackingJobs = {
+--	[1] = 'police',
+--	[2] = 'hunter',
+--}
 
 Config.SearchRadius = 50.0 -- How far the pet will search for a hunted animal. Always a float value i.e 50.0
 Config.FeedInterval = 300 -- How often in seconds the pet will want to be fed
@@ -59,35 +54,27 @@ Config.XpPerFeed = 20 -- The amount of XP every feed gives
 Config.NotifyWhenHungry = true -- Puts up a little notification letting you know your pet can be fed. 
 Config.AnimalFood = 'raw_meat' -- The item required to feed and/or level up your pet
 
+Config.Blip = {
+    blipName = Lang:t('label.petshop'), -- Config.Blip.blipName
+    blipSprite = -1733535731, -- Config.Blip.blipSprite
+    blipScale = 0.2, -- Config.Blip.blipScale
+}
 
 Config.Shops = {
     {
-        Name = Lang:t('label.petshop'),
-        Ring = false,
-        ActiveDistance = 1.0,
-        Coords = {
+        prompt = 'valentine-petshop',
+        ActiveDistance = 1.5,
+        Coords = vector3(-281.20, 684.55, 113.46),
+        Spawndog = vector4( -284.09, 685.34, 113.59, 234.45 ),
+        npcmodel = `cs_tigerhandler`,
+        npccoords = vector4(-281.20, 684.55, 113.46, 211.10),
+        npcpetmodel = `A_C_DogAustralianSheperd_01`,
+        npcpetcoords = vector4(-280.8288, 685.35223, 113.49935, 205.96496),
+        showblip = true,
+        Coords1 = {
             vector3(-281.20, 684.55, 113.46)
         },
-        Spawndog = vector4( -284.09, 685.34, 113.59, 234.45 ),
-        Blip = { sprite = -1646261997, x = -281.20, y = 684.55, z = 113.46 }
     }
-}
-
-Config.Blip = {
-    blipName = 'Petshop', -- Config.Blip.blipName
-    blipSprite = 'blip_animal', -- Config.Blip.blipSprite
-    blipScale = 0.2 -- Config.Blip.blipScale
-}
-
-Config.ShopLocations = {
-    {   --valentine petshop
-        name = 'Pet Shelter',
-        prompt = 'valentine-petshop',
-        coords = vector3(-281.20, 684.55, 113.46),
-        npcmodel = `cs_aberdeensister`,
-        npccoords = vector4(-281.20, 684.55, 113.46, 211.10),
-        showblip = true
-    }, 
 }
 
 Config.PetAttributes = {
@@ -101,12 +88,12 @@ Config.PetAttributes = {
 Config.Animals = { --These are the animals the dogs will retrieve
 	 --Hash ID must be the ID of the table
 	[-1003616053] =  {["name"] = "Duck", },
-    [1459778951] =  {["name"] = "Eagle", },
+    	[1459778951] =  {["name"] = "Eagle", },
 	[-164963696] = {["name"] = "Herring Seagull",},
 	[-1104697660] = {["name"] = "Vulture",},
 	[-466054788] = {["name"] = "Wild Turkey",},
-    [-2011226991] = {["name"] = "Wild Turkey",},
-    [-166054593] = {["name"] = "Wild Turkey",},
+   	[-2011226991] = {["name"] = "Wild Turkey",},
+   	[-166054593] = {["name"] = "Wild Turkey",},
 	[-1076508705] =  {["name"] = "Roseate Spoonbill",},
 	[-466687768] =  {["name"] = "Red-Footed Booby",},
 	[-575340245] =  {["name"] = "Wester Raven",},
