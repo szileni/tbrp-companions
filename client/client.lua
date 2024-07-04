@@ -659,58 +659,6 @@ function setPetBehavior(petPed)
 	SetRelationshipBetweenGroups(1, GetPedRelationshipGroupHash(petPed), -1683752762)
 end
 
-RegisterNetEvent('tbrp_companions:spawndog')
-AddEventHandler('tbrp_companions:spawndog', function (dog,skin,isInShop,xp,canTrack)
-
-	if currentPetPed then
-		
-		RSGCore.Functions.Notify(Lang:t('info.petalreadyhere'), 'info', 3000)
-		
-	else
-		if recentlySpawned <= 0 then
-			recentlySpawned = Config.PetAttributes.SpawnLimiter
-			RSGCore.Functions.Notify(Lang:t('info.petspawned'), 'info', 3000)
-
-		else
-			RSGCore.Functions.Notify(Lang:t('info.petspawning', {recentlySpawned = recentlySpawned}), 'info', 3000)
-			return
-		end
-	isPetHungry = false
-	FeedTimer = 0
-	notifyHungry = false
-	AddedFeedPrompts = false
-	TrackingEnabled = canTrack
-	local player = PlayerPedId()
-	local model = GetHashKey( dog )
-	local x, y, z, heading, a, b
-	-- Set initial pet location
---	if isInShop then
---		x, y, z, heading = -373.302, 786.904, 116.169, 273.18
---	else
---		x, y, z = table.unpack( GetOffsetFromEntityInWorldCoords( player, 0.0, -5.0, 0.3 ) )
---		a, b = GetGroundZAndNormalFor_3dCoord( x, y, z + 10 )
---	end
-	RequestModel( model )
-	while not HasModelLoaded( model ) do
-		Wait(500)
-	end
-		if isInShop then
-			local x, y, z, w = table.unpack(Config.Shops[CurrentZoneActive].Spawndog)
-			spawnAnimal(model, player, x, y, z, w, skin, PlayerPedId(), false, true, xp) 
-		else
-			local EntityIsDead = false
-			if (currentPetPed ~= nil) then
-				EntityIsDead = IsEntityDead( currentPetPed )
-			end
-			if EntityIsDead then
-				spawnAnimal(model, player, x, y, b, heading, skin, PlayerPedId(), true, false, xp)
-			else
-				spawnAnimal(model, player, x, y, b, heading, skin, PlayerPedId(), false, false, xp) 
-			end
-		end
-	end
-end)
-
 function spawnAnimal (model, player, x, y, z, h, skin, PlayerPedId, isdead, isshop, xp) 
 	local EntityPedCoord = GetEntityCoords( player )
 	local EntitydogCoord = GetEntityCoords( currentPetPed )
@@ -759,6 +707,54 @@ function spawnAnimal (model, player, x, y, z, h, skin, PlayerPedId, isdead, issh
 		end
 	end
 end
+
+RegisterNetEvent('tbrp_companions:spawndog')
+AddEventHandler('tbrp_companions:spawndog', function (dog,skin,isInShop,xp,canTrack)
+	if currentPetPed then
+		RSGCore.Functions.Notify(Lang:t('info.petalreadyhere'), 'info', 3000)
+	else
+		if recentlySpawned <= 0 then
+			recentlySpawned = Config.PetAttributes.SpawnLimiter
+			RSGCore.Functions.Notify(Lang:t('info.petspawned'), 'info', 3000)
+		else
+			RSGCore.Functions.Notify(Lang:t('info.petspawning', {recentlySpawned = recentlySpawned}), 'info', 3000)
+			return
+		end
+	isPetHungry = false
+	FeedTimer = 0
+	notifyHungry = false
+	AddedFeedPrompts = false
+	TrackingEnabled = canTrack
+	local player = PlayerPedId()
+	local model = GetHashKey( dog )
+	local x, y, z, heading, a, b
+	-- Set initial pet location
+	if isInShop then
+		x, y, z, heading = -373.302, 786.904, 116.169, 273.18
+	else
+		x, y, z = table.unpack( GetOffsetFromEntityInWorldCoords( player, 0.0, -5.0, 0.3 ) )
+		a, b = GetGroundZAndNormalFor_3dCoord( x, y, z + 10 )
+	end
+	RequestModel( model )
+	while not HasModelLoaded( model ) do
+		Wait(500)
+	end
+	if isInShop then
+		local x, y, z, w = table.unpack(Config.Shops[CurrentZoneActive].Spawndog)
+		spawnAnimal(model, player, x, y, z, w, skin, PlayerPedId(), false, true, xp) 
+	else
+		local EntityIsDead = false
+		if (currentPetPed ~= nil) then
+			EntityIsDead = IsEntityDead( currentPetPed )
+		end
+		if EntityIsDead then
+			spawnAnimal(model, player, x, y, b, heading, skin, PlayerPedId(), true, false, xp)
+		else
+			spawnAnimal(model, player, x, y, b, heading, skin, PlayerPedId(), false, false, xp) 
+		end
+	end
+	end
+end)
 
 --------------------------------------
 -- UPDATE PET FED
@@ -870,27 +866,11 @@ function SET_PED_OUTFIT_PRESET ( dog, preset )
 	return Citizen.InvokeNative( 0x77FF8D35EEC6BBC4, dog, preset, 0 )
 end
 
---------------------------------------
--- IF PLAYER DEAD, SEND PET AWAY
---------------------------------------
-
-CreateThread(function()
-	local ped = PlayerPedId()
-	local _source = source
-    while true do
-        local health = GetEntityHealth(ped)
-        if health == 0 then
-			TriggerEvent('tbrp_companions:putaway')
-        end
-        Wait(1000)
-    end
-end)
-
 AddEventHandler('onResourceStop', function(resource)
 	if resource == GetCurrentResourceName() then
 	TriggerEvent( 'tbrp_companions:putaway' )
-		if fetchedObj ~= nil then
-			DeleteEntity(fetchedObj)
-		end	
+--		if fetchedObj ~= nil then
+--			DeleteEntity(fetchedObj)
+--		end	
 	end
 end)
