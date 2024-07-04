@@ -5,7 +5,7 @@ Config = {}
 Config.Debug = false
 Config.FadeIn = true
 Config.DistanceSpawn = 20.0
-Config.EnableTarget = false --For Pet Shop NPC
+Config.EnableTarget = true --For Pet Shop NPC
 
 Config.KeyBind = 'E'
 
@@ -37,7 +37,7 @@ Config.TrackOnlyNPC = false -- If this is enabled, you can track NPC peds and an
 Config.DefensiveMode = true --If set to true, pets will become hostile to anything you are in combat with
 Config.NoFear = true --Set this to true if you are using Bears/Wolves as pets so that your horses won't be in constant fear and wont get stuck on the eating dead body animation.
 
---Not working right now
+--Not working correcly right now, I need to check it
 --Config.AnimalTrackingJobOnly = false -- If true only people with the jobs below can use the tracking option
 --Config.AnimalTrackingJobs = {
 --	[1] = 'police',
@@ -45,7 +45,7 @@ Config.NoFear = true --Set this to true if you are using Bears/Wolves as pets so
 --}
 
 Config.SearchRadius = 50.0 -- How far the pet will search for a hunted animal. Always a float value i.e 50.0
-Config.FeedInterval = 300 -- How often in seconds the pet will want to be fed
+Config.FeedInterval = 10 -- How often in seconds the pet will want to be fed
 
 Config.RaiseAnimal = true -- If this is enabled, you will have to feed your animal for it to gain XP and grow. Only full grown pets can use commands (halfway you get the Stay command)
 
@@ -63,10 +63,11 @@ Config.Blip = {
 Config.Shops = {
     {
         prompt = 'valentine-petshop',
+		Name = Lang:t('label.petshop'),
         ActiveDistance = 1.5,
         Coords = vector3(-281.20, 684.55, 113.46),
         Spawndog = vector4( -284.09, 685.34, 113.59, 234.45 ),
-        npcmodel = `cs_tigerhandler`,
+        npcmodel = `mp_u_f_m_nat_traveler_01`,
         npccoords = vector4(-281.20, 684.55, 113.46, 211.10),
         npcpetmodel = `A_C_DogAustralianSheperd_01`,
         npcpetcoords = vector4(-280.8288, 685.35223, 113.49935, 205.96496),
@@ -88,12 +89,12 @@ Config.PetAttributes = {
 Config.Animals = { --These are the animals the dogs will retrieve
 	 --Hash ID must be the ID of the table
 	[-1003616053] =  {["name"] = "Duck", },
-    	[1459778951] =  {["name"] = "Eagle", },
+    [1459778951] =  {["name"] = "Eagle", },
 	[-164963696] = {["name"] = "Herring Seagull",},
 	[-1104697660] = {["name"] = "Vulture",},
 	[-466054788] = {["name"] = "Wild Turkey",},
-   	[-2011226991] = {["name"] = "Wild Turkey",},
-   	[-166054593] = {["name"] = "Wild Turkey",},
+    [-2011226991] = {["name"] = "Wild Turkey",},
+    [-166054593] = {["name"] = "Wild Turkey",},
 	[-1076508705] =  {["name"] = "Roseate Spoonbill",},
 	[-466687768] =  {["name"] = "Red-Footed Booby",},
 	[-575340245] =  {["name"] = "Wester Raven",},
