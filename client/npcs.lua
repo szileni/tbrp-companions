@@ -62,7 +62,7 @@ function NearPed(npcmodel, npccoords)
         exports['rsg-target']:AddTargetEntity(spawnedPed, {
             options = {
                 {
-                    icon = "fa-solid fa-drumstick-bite",
+                    icon = "fa-solid fa-paw",
                     label = Lang:t('label.petshop'),
                     targeticon = "fas fa-eye",
                     action = function()
