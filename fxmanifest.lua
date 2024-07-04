@@ -10,19 +10,19 @@ client_scripts {
     'client/warmenu.lua',
     'client/client.lua',
     'config.lua',
-	'client/npcs.lua',
+    'client/npcs.lua',
 }
 
 shared_scripts {
     '@rsg-core/shared/locale.lua',
-    'locales/hu.lua', -- Change to your language
+    'locales/en.lua', -- Change to your language
     'config.lua',
 }
 
 server_scripts {
     'config.lua',
     'server/*.lua',
-	'@oxmysql/lib/MySQL.lua',
+    '@oxmysql/lib/MySQL.lua',
 }
 
 dependencies {
