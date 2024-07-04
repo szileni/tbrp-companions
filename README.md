@@ -46,7 +46,7 @@ With this script players are able to own pets that can retrieve hunted prey, tra
 
 ## RSG-Radialmenu
 
-    [6] = {
+    [6] = { -- Change it to your side
         id = 'pet',
         title = 'Pet menu',
         icon = 'dog',
