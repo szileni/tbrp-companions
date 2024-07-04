@@ -55,7 +55,6 @@ AddEventHandler('tbrp_companions:feedPet', function(xp)
 		else
 		Player.Functions.RemoveItem(Config.AnimalFood, 1)		
 		TriggerClientEvent('tbrp_companions:UpdateDogFed', _src, newXp)
-		TriggerEvent('tbrp_companions:getPetinfo')
 		end
 	end
 end)
@@ -65,7 +64,7 @@ end)
 --------------------------------------
 
 RegisterServerEvent('tbrp_companions:buydog')
-AddEventHandler('tbrp_companions:buydog', function (args)
+AddEventHandler('tbrp_companions:buydog', function (args, _src)
     local _src = source
 	local Player = RSGCore.Functions.GetPlayer(_src)
 	local u_identifier = Player.PlayerData.citizenid
@@ -82,6 +81,7 @@ AddEventHandler('tbrp_companions:buydog', function (args)
 	MySQL.Async.fetchAll("SELECT * FROM companions WHERE identifier = @identifier AND charidentifier = @charidentifier", {['identifier'] = u_identifier, ['charidentifier'] = u_charid}, function(result)
 		if #result > 0 then 
 		TriggerClientEvent('tbrp_companions:selldog', _src)
+		Wait(100)
 		TriggerClientEvent('RSGCore:Notify', _src, Lang:t('success.swappet'), 'success')
 		TriggerClientEvent('tbrp_companions:spawndog', _src, _model, skin, true, 0,canTrack)
 		Player.Functions.RemoveMoney('cash', _price)
@@ -104,23 +104,23 @@ end)
 --------------------------------------
 
 RegisterServerEvent('tbrp_companions:loaddog')
-AddEventHandler('tbrp_companions:loaddog', function()
+AddEventHandler('tbrp_companions:loaddog', function(_src)
     local _src = source
-		local Player = RSGCore.Functions.GetPlayer(_src)
-		local u_identifier = Player.PlayerData.citizenid
-		local u_charid = Player.PlayerData.id
-		local canTrack = CanTrack(_src)
-		local Parameters = { ['identifier'] = u_identifier, ['charidentifier'] = u_charid }
-		MySQL.Async.fetchAll( "SELECT * FROM companions WHERE identifier = @identifier  AND charidentifier = @charidentifier", Parameters, function(result)
-			if result[1] then
-				local dog = result[1].dog
-				local skin = result[1].skin
-				local xp = result[1].xp or 0
-				TriggerClientEvent("tbrp_companions:spawndog", _src, dog, skin, false, xp, canTrack)
-			else
-				TriggerClientEvent('RSGCore:Notify', _src, Lang:t('error.nopet'), 'error')
-			end
-		end)	
+	local Player = RSGCore.Functions.GetPlayer(_src)
+	local u_identifier = Player.PlayerData.citizenid
+	local u_charid = Player.PlayerData.id
+	local canTrack = CanTrack(_src)
+	local Parameters = { ['identifier'] = u_identifier, ['charidentifier'] = u_charid }
+	MySQL.Async.fetchAll( "SELECT * FROM companions WHERE identifier = @identifier  AND charidentifier = @charidentifier", Parameters, function(result)
+		if result[1] then
+			local dog = result[1].dog
+			local skin = result[1].skin
+			local xp = result[1].xp or 0
+			TriggerClientEvent("tbrp_companions:spawndog", _src, dog, skin, false, xp, canTrack)
+		else
+			TriggerClientEvent('RSGCore:Notify', _src, Lang:t('error.nopet'), 'error')
+		end
+	end)	
 end)
 
 --------------------------------------
