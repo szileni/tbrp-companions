@@ -1,4 +1,3 @@
-
 fx_version "adamant"
 
 rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
@@ -6,9 +5,6 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 games {"rdr3"}
 
 version '1.0.0'
-
-ConvarFramework = "rsg"
-
 
 client_scripts {
     'client/warmenu.lua',
@@ -19,13 +15,13 @@ client_scripts {
 
 shared_scripts {
     '@rsg-core/shared/locale.lua',
-    'locales/en.lua', -- Change to your language
+    'locales/hu.lua', -- Change to your language
     'config.lua',
 }
 
 server_scripts {
     'config.lua',
-    'server/server.lua',
+    'server/*.lua',
 	'@oxmysql/lib/MySQL.lua',
 }
 
