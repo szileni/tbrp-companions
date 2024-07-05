@@ -45,7 +45,7 @@ Config.NoFear = true --Set this to true if you are using Bears/Wolves as pets so
 --}
 
 Config.SearchRadius = 50.0 -- How far the pet will search for a hunted animal. Always a float value i.e 50.0
-Config.FeedInterval = 10 -- How often in seconds the pet will want to be fed
+Config.FeedInterval = 1000 -- How often in seconds the pet will want to be fed
 
 Config.RaiseAnimal = true -- If this is enabled, you will have to feed your animal for it to gain XP and grow. Only full grown pets can use commands (halfway you get the Stay command)
 
