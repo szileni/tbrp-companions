@@ -72,9 +72,6 @@ Config.Shops = {
         npcpetmodel = `A_C_DogAustralianSheperd_01`,
         npcpetcoords = vector4(-280.8288, 685.35223, 113.49935, 205.96496),
         showblip = true,
-        Coords1 = {
-            vector3(-281.20, 684.55, 113.46)
-        },
     }
 }
 
