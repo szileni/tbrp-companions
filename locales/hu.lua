@@ -5,6 +5,7 @@ local Translations = {
 	nomoney = 'Nincs elég pénzed, hogy örökbe fogadhass egy kiskedvencet!',
 	petdead = 'Kiskedvencedet elpusztult!',
 	notretrieve = 'Kiskedvenced nem hívható vissza!',
+	brokeanim = 'Megtörted az animációt, áthelyezés...',
     },
     success = {
 	petsold = 'Házikedvencedet befogadta a menhely!',
@@ -26,9 +27,14 @@ local Translations = {
 	petfeed = 'Háziállatod ekkor lesz éhes: %{timeLeft}',
 	retrieve = 'Kiskedvenced készen áll a visszahívásra..',
 	petprogress = 'Út a kiskedvenced felnötté válásáig %{xpp} / %{cfg}...🐶',
+    close_1 = 'Kisállat menhely zárva tart...',
+    close_2 = 'Gyere vissza ',
+    close_3 = '-kor',
     },
 	label = {
 	petshop = 'Kisállat menhely',
+	petshop_2 = 'Kisállat bolt',
+	petshop_3 = 'Kisállat örökbeadása',
 	},
 }
 
