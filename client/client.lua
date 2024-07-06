@@ -29,66 +29,6 @@ local AddedAttackPrompt = {} -- Add the entities you've already targeted so it d
 local AddedTrackPrompt = {} -- Add the entities you've already targeted so it doesn't try adding the prompt over and over again. 
 local SpawnedPetshopBilps = {}
 
-local function SetPetAttributes(entity)
-    -- | SET_ATTRIBUTE_POINTS | --
-    Citizen.InvokeNative( 0x09A59688C26D88DF, entity, 0, 1100 )
-    Citizen.InvokeNative( 0x09A59688C26D88DF, entity, 1, 1100 )
-    Citizen.InvokeNative( 0x09A59688C26D88DF, entity, 2, 1100 )
-    -- | ADD_ATTRIBUTE_POINTS | --
-    Citizen.InvokeNative( 0x75415EE0CB583760, entity, 0, 1100 )
-    Citizen.InvokeNative( 0x75415EE0CB583760, entity, 1, 1100 )
-    Citizen.InvokeNative( 0x75415EE0CB583760, entity, 2, 1100 )
-    -- | SET_ATTRIBUTE_BASE_RANK | --
-    Citizen.InvokeNative( 0x5DA12E025D47D4E5, entity, 0, 10 )
-    Citizen.InvokeNative( 0x5DA12E025D47D4E5, entity, 1, 10 )
-    Citizen.InvokeNative( 0x5DA12E025D47D4E5, entity, 2, 10 )
-    -- | SET_ATTRIBUTE_BONUS_RANK | --
-    Citizen.InvokeNative( 0x920F9488BD115EFB, entity, 0, 10 )
-    Citizen.InvokeNative( 0x920F9488BD115EFB, entity, 1, 10 )
-    Citizen.InvokeNative( 0x920F9488BD115EFB, entity, 2, 10 )
-    -- | SET_ATTRIBUTE_OVERPOWER_AMOUNT | --
-    Citizen.InvokeNative( 0xF6A7C08DF2E28B28, entity, 0, 5000.0, false )
-    Citizen.InvokeNative( 0xF6A7C08DF2E28B28, entity, 1, 5000.0, false )
-    Citizen.InvokeNative( 0xF6A7C08DF2E28B28, entity, 2, 5000.0, false )
-end
-
-local function DisplayHelp(_message, x, y, w, h, enableShadow, col1, col2, col3, a, centre)
-	local str = CreateVarString(10, "LITERAL_STRING", _message, Citizen.ResultAsLong())
-	SetTextScale(w, h)
-	SetTextColor(col1, col2, col3, a)
-	SetTextCentre(centre)
-	if enableShadow then
-		SetTextDropshadow(1, 0, 0, 0, 255)
-	end
-	Citizen.InvokeNative(0xADA9255D, 10);
-	DisplayText(str, x, y)
-end
-
-local function ShowNotification(_message)
-	local timer = 400
-	while timer > 0 do
-		DisplayHelp(_message, 0.50, 0.90, 0.6, 0.6, true, 161, 3, 0, 255, true)
-		timer = timer - 1
-		Citizen.Wait(0)
-	end
-end
-
-local function checkAvailability(pet) 
-	local availability = pet.Availability
-	local available = false
-	if availability ~= nil then 
-		for index, peti in pairs(availability) do
-			if peti == CurrentZoneActive then
-				available = true
-				return available
-			end
-		end
-	else
-		available = true
-	end
-	return available
-end
-
 --------------------------------------
 -- PETSHOP PROMPTS AND BLIPS
 --------------------------------------
@@ -97,7 +37,7 @@ Citizen.CreateThread(function()
         if not Config.EnableTarget then
             exports['rsg-core']:createPrompt(v.prompt, v.Coords, RSGCore.Shared.Keybinds[Config.KeyBind], Lang:t('label.petshop'), {
                 type = 'client',
-                event = 'tbrp_companions:client:openwarmenu',
+                event = 'tbrp_companions:client:openpetshop2',
             })
         end
 		for i = 1, #Config.Shops do
@@ -114,59 +54,138 @@ Citizen.CreateThread(function()
 end)
 
 --------------------------------------
--- OPEN PETSHOP
+-- Pet shelter hours system
 --------------------------------------
+-- open petshop with opening hours
+local OpenPetShop = function()
+    if not Config.AlwaysOpen then
+        local hour = GetClockHours()
+        if (hour < Config.OpenTime) or (hour >= Config.CloseTime) and not Config.AlwaysOpen then
+            lib.notify({
+                title = Lang:t('info.close_1'),
+                description = Lang:t('info.close_2')..Config.OpenTime..Lang:t('info.close_3'),
+                type = 'error',
+                icon = 'fa-solid fa-shop',
+                iconAnimation = 'shake',
+                duration = 7000
+            })
+            return
+        end
+    end
+    TriggerEvent('tbrp_companions:client:openpetshop')
+end
 
-AddEventHandler('tbrp_companions:client:openwarmenu', function()
-	for index, shop in pairs(Config.Shops) do
-			WarMenu.SetTitle('id_dog', shop.Name)
-			WarMenu.OpenMenu('id_dog')
-			CurrentZoneActive = index
-	end
+--------------------------------------
+-- get petshelter hours function
+--------------------------------------
+local GetPetShelterHours = function()
+    local hour = GetClockHours()
+    if not Config.AlwaysOpen then
+        if (hour < Config.OpenTime) or (hour >= Config.CloseTime) then
+            for k, v in pairs(SpawnedPetshopBilps) do
+                BlipAddModifier(v, joaat('BLIP_MODIFIER_MP_COLOR_2'))
+            end
+        else
+            for k, v in pairs(SpawnedPetshopBilps) do
+                BlipAddModifier(v, joaat('BLIP_MODIFIER_MP_COLOR_8'))
+            end
+        end
+    else
+        for k, v in pairs(SpawnedPetshopBilps) do
+            BlipAddModifier(v, joaat('BLIP_MODIFIER_MP_COLOR_8'))
+        end
+    end
+end
+
+--------------------------------------
+-- get petshelter hours on player loading
+--------------------------------------
+RegisterNetEvent('RSGCore:Client:OnPlayerLoaded', function()
+    GetPetShelterHours()
 end)
 
-Citizen.CreateThread(function()
-	WarMenu.CreateMenu('id_dog', '')
-	repeat
-		if WarMenu.IsMenuOpened('id_dog') then
-		local giveaway = Lang:t('primary.sellpet')
+---------------------------------
+-- update petshop hours every min
+---------------------------------
+CreateThread(function()
+    while true do
+        GetPetShelterHours()
+        Wait(60000) -- every min
+    end       
+end)
 
-			local shop = Config.Shops[CurrentZoneActive]
-			
-			if WarMenu.Button(giveaway) then
-				TriggerServerEvent('tbrp_companions:sellpet')
-				WarMenu.CloseMenu()
-			end
-			
-			for i = 1, #pets do
-				local acheck = checkAvailability(pets[i])
-				if acheck == true then
-					if WarMenu.Button(pets[i]['Text'], pets[i]['SubText'], pets[i]['Desc']) then
-						TriggerServerEvent('tbrp_companions:buydog', pets[i]['Param'])
-						WarMenu.CloseMenu()
-					end
-				end
-			end
-
-			WarMenu.Display()
-		end
-		Citizen.Wait(0)
-	until false
+AddEventHandler('tbrp_companions:client:openpetshop2', function()
+    OpenPetShop()
 end)
 
 --------------------------------------
--- CALL PET
+-- PETSHOP OPEN AND MENUS
 --------------------------------------
+RegisterNetEvent('tbrp_companions:client:openpetshop', function()
+	lib.registerContext({
+		id = 'petshop_menu',
+		title = Lang:t('label.petshop'),
+		options = {
+			{
+				title = Lang:t('label.petshop'),
+				icon = 'fa-solid fa-box',
+				event = 'tbrp_companions:client:petshelter',
+				arrow = true
+			},
+			{
+				title = Lang:t('label.petshop_3'),
+				icon = 'fa-solid fa-box',
+				serverEvent = 'tbrp_companions:sellpet',
+				arrow = true
+			},
+			{
+				title = Lang:t('label.petshop_2'),
+				icon = 'fa-solid fa-box',
+				event = 'tbrp_companions:client:OpenPetShop',
+				arrow = true
+			},
+		}
+	})
+	lib.showContext('petshop_menu')
+end)
 
-Citizen.CreateThread(function()
-	while true do
-		if Config.CallPetKey == true then
-			if IsControlJustPressed(0, keys[Config.TriggerKeys.CallPet]) then
-				TriggerServerEvent('tbrp_companions:loaddog')
-			end
-		end
-		Citizen.Wait(1)
+-- Pet Shop
+
+RegisterNetEvent('tbrp_companions:client:OpenPetShop', function()
+    local ShopItems = {}
+    ShopItems.label = Lang:t('label.petshop_2')
+    ShopItems.items = Config.PetShop
+    ShopItems.slots = #Config.PetShop
+    TriggerServerEvent("inventory:server:OpenInventory", "shop", "PetShop_"..math.random(1, 99), ShopItems)
+end)
+
+-- Pet Shelter
+
+RegisterNetEvent('tbrp_companions:client:petshelter', function(price, model)
+    local options = {}
+    for k,v in ipairs(Config.Pets) do
+        options[#options + 1] = {
+            title = v.Text,
+            description = v.Desc,
+            icon = 'fa-solid fa-box',
+            icon = "nui://" .. Config.Img .. v.img,
+            image = "nui://" .. Config.Img .. v.img,
+            args = {
+                price = v.Param.Price,
+                model = v.Param.Model
+            },
+            serverEvent = 'tbrp_companions:buydog',
+            arrow = true,
+        }
 	end
+    lib.registerContext({
+        id = 'petshelterpets',
+        title = Lang:t('label.petshop'),
+        menu = 'petshop_menu',
+        position = 'top-right',
+        options = options
+    })
+    lib.showContext('petshelterpets')
 end)
 
 --------------------------------------
@@ -226,6 +245,7 @@ Citizen.CreateThread(function()
 				end
 			end
 			FeedTimer = FeedTimer + 1
+			print(FeedTimer)
 			if Config.FeedInterval <= FeedTimer then
 			 isPetHungry = true
 				 if not AddedFeedPrompts then --Constantly re-adding the prompts breaks them, so I added this to only do it once. not AddedFeedPrompts
@@ -382,7 +402,7 @@ function DogEatAnimation()
             waiting = waiting + 100
             Citizen.Wait(100)
             if waiting > 5000 then
-			  TriggerEvent( 'UI:DrawNotification', "You broke the animation, Relocate")
+			  RSGCore.Functions.Notify(Lang:t('info.petaway'), 'error', 3000)
                 break
             end      
         end
@@ -397,7 +417,7 @@ function DogSitAnimation()
             waiting = waiting + 100
             Citizen.Wait(100)
             if waiting > 5000 then
-               TriggerEvent( 'UI:DrawNotification', "You broke the animation, Relocate")
+			   RSGCore.Functions.Notify(Lang:t('error.brokeanim'), 'error', 3000)
                 break
             end      
         end
@@ -405,17 +425,19 @@ function DogSitAnimation()
 end
 
 --------------------------------------
--- NOTIFICATION
---------------------------------------
-
-RegisterNetEvent('UI:DrawNotification')
-AddEventHandler('UI:DrawNotification', function( _message )
-	ShowNotification( _message )
-end)
-
---------------------------------------
 -- SELL/REMOVE/FLEE/CALL PET
 --------------------------------------
+
+Citizen.CreateThread(function()
+	while true do
+		if Config.CallPetKey == true then
+			if IsControlJustPressed(0, keys[Config.TriggerKeys.CallPet]) then
+				TriggerServerEvent('tbrp_companions:loaddog')
+			end
+		end
+		Citizen.Wait(1)
+	end
+end)
 
 RegisterNetEvent('tbrp_companions:selldog')
 AddEventHandler('tbrp_companions:selldog', function (args)
@@ -458,6 +480,29 @@ end)
 --------------------------------------
 -- PROMPTS
 --------------------------------------
+
+local function SetPetAttributes(entity)
+    -- | SET_ATTRIBUTE_POINTS | --
+    Citizen.InvokeNative( 0x09A59688C26D88DF, entity, 0, 1100 )
+    Citizen.InvokeNative( 0x09A59688C26D88DF, entity, 1, 1100 )
+    Citizen.InvokeNative( 0x09A59688C26D88DF, entity, 2, 1100 )
+    -- | ADD_ATTRIBUTE_POINTS | --
+    Citizen.InvokeNative( 0x75415EE0CB583760, entity, 0, 1100 )
+    Citizen.InvokeNative( 0x75415EE0CB583760, entity, 1, 1100 )
+    Citizen.InvokeNative( 0x75415EE0CB583760, entity, 2, 1100 )
+    -- | SET_ATTRIBUTE_BASE_RANK | --
+    Citizen.InvokeNative( 0x5DA12E025D47D4E5, entity, 0, 10 )
+    Citizen.InvokeNative( 0x5DA12E025D47D4E5, entity, 1, 10 )
+    Citizen.InvokeNative( 0x5DA12E025D47D4E5, entity, 2, 10 )
+    -- | SET_ATTRIBUTE_BONUS_RANK | --
+    Citizen.InvokeNative( 0x920F9488BD115EFB, entity, 0, 10 )
+    Citizen.InvokeNative( 0x920F9488BD115EFB, entity, 1, 10 )
+    Citizen.InvokeNative( 0x920F9488BD115EFB, entity, 2, 10 )
+    -- | SET_ATTRIBUTE_OVERPOWER_AMOUNT | --
+    Citizen.InvokeNative( 0xF6A7C08DF2E28B28, entity, 0, 5000.0, false )
+    Citizen.InvokeNative( 0xF6A7C08DF2E28B28, entity, 1, 5000.0, false )
+    Citizen.InvokeNative( 0xF6A7C08DF2E28B28, entity, 2, 5000.0, false )
+end
 
 function AddFeedPrompts(entity)
     local group = Citizen.InvokeNative(0xB796970BD125FCE8, entity, Citizen.ResultAsLong()) -- PromptGetGroupIdForTargetEntity
@@ -720,39 +765,51 @@ AddEventHandler('tbrp_companions:spawndog', function (dog,skin,isInShop,xp,canTr
 			RSGCore.Functions.Notify(Lang:t('info.petspawning', {recentlySpawned = recentlySpawned}), 'info', 3000)
 			return
 		end
-	isPetHungry = false
-	FeedTimer = 0
-	notifyHungry = false
-	AddedFeedPrompts = false
-	TrackingEnabled = canTrack
-	local player = PlayerPedId()
-	local model = GetHashKey( dog )
-	local x, y, z, heading, a, b
-	-- Set initial pet location
-	if isInShop then
-		x, y, z, heading = -373.302, 786.904, 116.169, 273.18
-	else
-		x, y, z = table.unpack( GetOffsetFromEntityInWorldCoords( player, 0.0, -5.0, 0.3 ) )
-		a, b = GetGroundZAndNormalFor_3dCoord( x, y, z + 10 )
-	end
-	RequestModel( model )
-	while not HasModelLoaded( model ) do
-		Wait(500)
-	end
-	if isInShop then
-		local x, y, z, w = table.unpack(Config.Shops[CurrentZoneActive].Spawndog)
-		spawnAnimal(model, player, x, y, z, w, skin, PlayerPedId(), false, true, xp) 
-	else
-		local EntityIsDead = false
-		if (currentPetPed ~= nil) then
-			EntityIsDead = IsEntityDead( currentPetPed )
+		isPetHungry = false
+		FeedTimer = 0
+		notifyHungry = false
+		AddedFeedPrompts = false
+		TrackingEnabled = canTrack
+		local player = PlayerPedId()
+		local model = GetHashKey( dog )
+		local x, y, z, heading, a, b
+		
+		if not isInShop then
+			x, y, z = table.unpack( GetOffsetFromEntityInWorldCoords( player, 0.0, -5.0, 0.3 ) )
+			a, b = GetGroundZAndNormalFor_3dCoord( x, y, z + 10 )
 		end
-		if EntityIsDead then
-			spawnAnimal(model, player, x, y, b, heading, skin, PlayerPedId(), true, false, xp)
+		
+		RequestModel( model )
+		
+		while not HasModelLoaded( model ) do
+			Wait(500)
+		end
+		
+		if isInShop then
+			while true do
+				Wait(500)
+				for k3,v3 in pairs(Config.Shops) do
+					local playerCoords = GetEntityCoords(PlayerPedId())
+					local distance = #(playerCoords - v3.npcpetcoords.xyz)
+					if distance < Config.DistanceSpawn then
+						local x, y, z, w = v3.Spawndog
+						spawnAnimal(model, player, x, y, z, w, skin, PlayerPedId(), false, true, xp) 
+						return false
+					end
+
+				end
+			end
 		else
-			spawnAnimal(model, player, x, y, b, heading, skin, PlayerPedId(), false, false, xp) 
+			local EntityIsDead = false
+			if (currentPetPed ~= nil) then
+				EntityIsDead = IsEntityDead( currentPetPed )
+			end
+			if EntityIsDead then
+				spawnAnimal(model, player, x, y, b, heading, skin, PlayerPedId(), true, false, xp)
+			else
+				spawnAnimal(model, player, x, y, b, heading, skin, PlayerPedId(), false, false, xp) 
+			end
 		end
-	end
 	end
 end)
 
@@ -868,9 +925,6 @@ end
 
 AddEventHandler('onResourceStop', function(resource)
 	if resource == GetCurrentResourceName() then
-	TriggerEvent( 'tbrp_companions:putaway' )
---		if fetchedObj ~= nil then
---			DeleteEntity(fetchedObj)
---		end	
+		TriggerEvent( 'tbrp_companions:putaway' )
 	end
 end)
