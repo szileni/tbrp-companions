@@ -41,8 +41,9 @@ With this script players are able to own pets that can retrieve hunted prey, tra
 ## How to Install
 1. Put tbrp_companions in your `resources` folder
 2. Enter `ensure tbrp_companions` in your server.cfg
-3. Import the `companions.sql`
-4. Go through `config.lua` before restarting your server
+3. Import the `tbrp_companions.sql` into `installation` folder
+4. Import `installation\images\` into `rsg-inventory\html\images\`
+5. Go through `config.lua` before restarting your server
 
 ## RSG-Radialmenu
 
