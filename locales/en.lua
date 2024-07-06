@@ -5,6 +5,7 @@ local Translations = {
 	nomoney = 'You dont have enough money to adopt a pet!',
 	petdead = 'Your pet has died!',
 	notretrieve = 'Your pet cannot be called back!',
+	brokeanim = 'You broke the animation, Relocate',
     },
     success = {
 	petsold = 'Your pet has been adopted by the shelter!',
@@ -26,9 +27,14 @@ local Translations = {
 	petfeed = 'Your pet will be hungry when: %{timeLeft}',
 	retrieve = 'Your pet is ready to be called back..',
 	petprogress = 'The way until your little friend becomes an adult %{xpp} / %{cfg}...🐶',
+    close_1 = 'Pet Shelter Closed',
+    close_2 = 'come back after ',
+    close_3 = 'am',
     },
 	label = {
-	petshop = 'Pet shelter',
+	petshop = 'Pet Shelter',
+	petshop_2 = 'Pet Shop',
+	petshop_3 = 'Sell Pet',
 	},
 }
 
