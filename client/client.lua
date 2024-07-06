@@ -245,7 +245,6 @@ Citizen.CreateThread(function()
 				end
 			end
 			FeedTimer = FeedTimer + 1
-			print(FeedTimer)
 			if Config.FeedInterval <= FeedTimer then
 			 isPetHungry = true
 				 if not AddedFeedPrompts then --Constantly re-adding the prompts breaks them, so I added this to only do it once. not AddedFeedPrompts
