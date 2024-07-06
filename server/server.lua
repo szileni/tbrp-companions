@@ -11,9 +11,9 @@ AddEventHandler('tbrp_companions:sellpet', function()
 	local Player = RSGCore.Functions.GetPlayer(_src)
 	local u_identifier = Player.PlayerData.citizenid
 	local u_charid = Player.PlayerData.id
-	MySQL.Async.fetchAll("SELECT * FROM companions WHERE identifier = @identifier AND charidentifier = @charidentifier", {['identifier'] = u_identifier, ['charidentifier'] = u_charid}, function(result)
+	MySQL.Async.fetchAll("SELECT * FROM tbrp_companions WHERE identifier = @identifier AND charidentifier = @charidentifier", {['identifier'] = u_identifier, ['charidentifier'] = u_charid}, function(result)
 		if #result > 0 then 
-			MySQL.Sync.execute("DELETE FROM companions WHERE identifier = @identifier AND charidentifier = @charidentifier", {["identifier"] = u_identifier, ['charidentifier'] = u_charid})
+			MySQL.Sync.execute("DELETE FROM tbrp_companions WHERE identifier = @identifier AND charidentifier = @charidentifier", {["identifier"] = u_identifier, ['charidentifier'] = u_charid})
 			TriggerClientEvent('tbrp_companions:selldog', _src)
 			TriggerClientEvent('RSGCore:Notify', _src, Lang:t('success.petsold'), 'success')
 		else
@@ -42,13 +42,10 @@ AddEventHandler('tbrp_companions:feedPet', function(xp)
 		if newXp <= Config.FullGrownXp then
 			Player.Functions.RemoveItem(Config.AnimalFood, 1)
 			local Parameters = { ['identifier'] = u_identifier, ['charidentifier'] = u_charid,  ['addedXp'] = Config.XpPerFeed }
-			MySQL.Sync.execute("UPDATE companions SET xp = xp + @addedXp  WHERE identifier = @identifier AND charidentifier = @charidentifier", Parameters, function(result) end)
-
-			local result = MySQL.query.await('SELECT * FROM companions WHERE identifier = @identifier AND charidentifier = @charidentifier', {['identifier'] = u_identifier, ['charidentifier'] = u_charid})
-
+			MySQL.Sync.execute("UPDATE tbrp_companions SET xp = xp + @addedXp  WHERE identifier = @identifier AND charidentifier = @charidentifier", Parameters, function(result) end)
+			local result = MySQL.query.await('SELECT * FROM tbrp_companions WHERE identifier = @identifier AND charidentifier = @charidentifier', {['identifier'] = u_identifier, ['charidentifier'] = u_charid})
 			for i = 1, #result do
 				local xpprogress = json.decode(result[i].xp)
-				print('loading '..xpprogress)
 						TriggerClientEvent('RSGCore:Notify', _src, Lang:t('info.petprogress', {cpf = Config.XpPerFeed, xpp = xpprogress, cfg = Config.FullGrownXp}), 'info', 6000)
 			end
 			TriggerClientEvent('tbrp_companions:UpdateDogFed', _src, newXp)
@@ -69,8 +66,8 @@ AddEventHandler('tbrp_companions:buydog', function (args, _src)
 	local Player = RSGCore.Functions.GetPlayer(_src)
 	local u_identifier = Player.PlayerData.citizenid
 	local u_charid = Player.PlayerData.id
-	local _price = args['Price']
-	local _model = args['Model']
+	local _price = args['price']
+	local _model = args['model']
 	local skin = math.floor(math.random(0, 2))
 	local canTrack = CanTrack(_src)
 	u_money = Player.PlayerData.money.cash
@@ -78,7 +75,7 @@ AddEventHandler('tbrp_companions:buydog', function (args, _src)
 		TriggerClientEvent('RSGCore:Notify', _src, Lang:t('error.nomoney'), 'error')
 		return
 	end
-	MySQL.Async.fetchAll("SELECT * FROM companions WHERE identifier = @identifier AND charidentifier = @charidentifier", {['identifier'] = u_identifier, ['charidentifier'] = u_charid}, function(result)
+	MySQL.Async.fetchAll("SELECT * FROM tbrp_companions WHERE identifier = @identifier AND charidentifier = @charidentifier", {['identifier'] = u_identifier, ['charidentifier'] = u_charid}, function(result)
 		if #result > 0 then 
 		TriggerClientEvent('tbrp_companions:selldog', _src)
 		Wait(100)
@@ -86,14 +83,14 @@ AddEventHandler('tbrp_companions:buydog', function (args, _src)
 		TriggerClientEvent('tbrp_companions:spawndog', _src, _model, skin, true, 0,canTrack)
 		Player.Functions.RemoveMoney('cash', _price)
 		local Parameters = { ['identifier'] = u_identifier, ['charidentifier'] = u_charid,  ['dog'] = _model, ['skin'] = skin , ['xp'] = 0 }
-		MySQL.Sync.execute("UPDATE companions SET dog = @dog, skin = @skin, xp = @xp WHERE identifier = @identifier AND charidentifier = @charidentifier", Parameters, function(r1)
+		MySQL.Sync.execute("UPDATE tbrp_companions SET dog = @dog, skin = @skin, xp = @xp WHERE identifier = @identifier AND charidentifier = @charidentifier", Parameters, function(r1)
 		end)
 		else
 			TriggerClientEvent('RSGCore:Notify', _src, Lang:t('success.buypet'), 'success')
 			TriggerClientEvent('tbrp_companions:spawndog', _src, _model, skin, true, 0,canTrack)
 			Player.Functions.RemoveMoney('cash', _price)
 			local Parameters = { ['identifier'] = u_identifier, ['charidentifier'] = u_charid,  ['dog'] = _model, ['skin'] = skin, ['xp'] = 0 }
-		   MySQL.Sync.execute("INSERT INTO companions ( `identifier`,`charidentifier`,`dog`,`skin`, `xp` ) VALUES ( @identifier, @charidentifier, @dog, @skin, @xp )", Parameters, function(r2)
+		   MySQL.Sync.execute("INSERT INTO tbrp_companions ( `identifier`,`charidentifier`,`dog`,`skin`, `xp` ) VALUES ( @identifier, @charidentifier, @dog, @skin, @xp )", Parameters, function(r2)
 			end)
 		end
 	end)
@@ -111,7 +108,7 @@ AddEventHandler('tbrp_companions:loaddog', function(_src)
 	local u_charid = Player.PlayerData.id
 	local canTrack = CanTrack(_src)
 	local Parameters = { ['identifier'] = u_identifier, ['charidentifier'] = u_charid }
-	MySQL.Async.fetchAll( "SELECT * FROM companions WHERE identifier = @identifier  AND charidentifier = @charidentifier", Parameters, function(result)
+	MySQL.Async.fetchAll( "SELECT * FROM tbrp_companions WHERE identifier = @identifier  AND charidentifier = @charidentifier", Parameters, function(result)
 		if result[1] then
 			local dog = result[1].dog
 			local skin = result[1].skin
