@@ -15,6 +15,7 @@ CreateThread(function()
             if distance < Config.DistanceSpawn and not spawnedPeds[k] then
                 local spawnedPed = NearPed(v.npcmodel, v.npccoords)
                 spawnedPeds[k] = { spawnedPed = spawnedPed }
+				TaskStartScenarioInPlace(spawnedPed, joaat(v.scenario), -1, true)
             end
             
             if distance >= Config.DistanceSpawn and spawnedPeds[k] then
@@ -66,7 +67,7 @@ function NearPed(npcmodel, npccoords)
                     label = Lang:t('label.petshop'),
                     targeticon = "fas fa-eye",
                     action = function()
-                        TriggerEvent("tbrp_companions:client:openwarmenu")
+                        TriggerEvent("tbrp_companions:client:openpetshop2")
                     end
                 },
             },
