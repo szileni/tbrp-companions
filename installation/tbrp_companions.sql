@@ -1,7 +1,12 @@
 CREATE TABLE `tbrp_companions` (
-  `identifier` varchar(40) NOT NULL,
-  `charidentifier` int NOT NULL DEFAULT '0',
-  `dog` varchar(255) NOT NULL,
-  `skin` int NOT NULL DEFAULT '0',
-  `xp` int DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+    `charidentifier` INT(11) NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+    `dog` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
+    `skin` INT(11) NULL DEFAULT '0',
+    `xp` INT(11) NULL DEFAULT '0',
+    PRIMARY KEY (`charidentifier`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=2
+;
